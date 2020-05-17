@@ -10,7 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
 
+  http: ^0.12.1
   cupertino_icons: ^0.1.2
+  geolocator: ^5.3.1
+  bdmap_location_flutter_plugin:
+    path: plugins/bdmap_location_flutter_plugin
+
 
 dev_dependencies:
   flutter_test:
