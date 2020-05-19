@@ -1,3 +1,5 @@
+import 'package:clima/screens/location_screen.dart';
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -5,6 +7,10 @@ import 'package:bdmap_location_flutter_plugin/bdmap_location_flutter_plugin.dart
 import 'package:bdmap_location_flutter_plugin/flutter_baidu_location.dart';
 import 'package:bdmap_location_flutter_plugin/flutter_baidu_location_android_option.dart';
 import 'package:bdmap_location_flutter_plugin/flutter_baidu_location_ios_option.dart';
+
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+const weatherApiKey = '10fa5181377e492f86277c71dc19b2b4';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -19,6 +25,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   LocationFlutterPlugin _locationPlugin = new LocationFlutterPlugin();
 
+  var weatherData;
+
   @override
   void initState() {
     super.initState();
@@ -27,22 +35,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
     _locationPlugin.requestPermission();
 
     /// 设置ios端ak, android端ak可以直接在清单文件中配置
-    LocationFlutterPlugin.setApiKey("4fBiqxUXzDF3VaYZXf6TpiBiLfKLAqN6");
+//    LocationFlutterPlugin.setApiKey("4fBiqxUXzDF3VaYZXf6TpiBiLfKLAqN6");
 
-    _locationListener = _locationPlugin
-        .onResultCallback()
-        .listen((Map<String, Object> result) {
+    _locationListener =
+        _locationPlugin.onResultCallback().listen((Map<String, Object> result) {
       setState(() {
         _loationResult = result;
+         if(weatherData == null) getData();
         try {
-          _baiduLocation = BaiduLocation.fromMap(result); // 将原生端返回的定位结果信息存储在定位结果类中
-          print(_loationResult.toString());
+          _baiduLocation =
+              BaiduLocation.fromMap(result); // 将原生端返回的定位结果信息存储在定位结果类中
+          // print(_loationResult.toString());
         } catch (e) {
           print(e);
         }
       });
     });
 
+    _startLocation();
   }
 
   @override
@@ -72,10 +82,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
     /// ios 端设置定位参数
     BaiduLocationIOSOption iosOption = new BaiduLocationIOSOption();
     iosOption.setIsNeedNewVersionRgc(true); // 设置是否需要返回最新版本rgc信息
-    iosOption.setBMKLocationCoordinateType("BMKLocationCoordinateTypeBMK09LL"); // 设置返回的位置坐标系类型
+    iosOption.setBMKLocationCoordinateType(
+        "BMKLocationCoordinateTypeBMK09LL"); // 设置返回的位置坐标系类型
     iosOption.setActivityType("CLActivityTypeAutomotiveNavigation"); // 设置应用位置类型
     iosOption.setLocationTimeout(10); // 设置位置获取超时时间
-    iosOption.setDesiredAccuracy("kCLLocationAccuracyBest");  // 设置预期精度参数
+    iosOption.setDesiredAccuracy("kCLLocationAccuracyBest"); // 设置预期精度参数
     iosOption.setReGeocodeTimeout(10); // 设置获取地址信息超时时间
     iosOption.setDistanceFilter(100); // 设置定位最小更新距离
     iosOption.setAllowsBackgroundLocationUpdates(true); // 是否允许后台定位
@@ -101,20 +112,29 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
+  void getData() async{
+    double longitude = _loationResult['longitude'];
+    double latitude = _loationResult['latitude'];
+
+    NetworkHelp networkHelp = NetworkHelp('https://free-api.heweather.net/s6/weather/now?location=$longitude,$latitude&key=$weatherApiKey');
+    weatherData = await networkHelp.getData();
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return LocationScreen(locationWeather: weatherData,);
+    }));
+
+    print(_loationResult.toString());
+    print(weatherData);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            //Get the current location
-            _startLocation();
-          },
-          child: Text('Get Location'),
-        ),
+        child: SpinKitRotatingCircle(
+          color: Colors.white,
+          size: 50.0,
+        )
       ),
     );
   }
-
 }
