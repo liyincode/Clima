@@ -1,6 +1,13 @@
+import 'package:clima/services/networking.dart';
+
 class WeatherModel {
 
+  Future<dynamic> getCityWeather(String cityName) async {
+    NetworkHelp networkHelp = NetworkHelp('https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=7174d63e98b5ad444037180b232c75c2&units=metric');
 
+    var weatherData = await networkHelp.getData();
+    return weatherData;
+  }
 
   String getWeatherIcon(int condition) {
     if (condition < 300) {

@@ -86,9 +86,6 @@ class Location {
 
     _startLocation();
 
-    const timeout = const Duration(seconds: 1);
-
-
     return _loationResult;
   }
 }
