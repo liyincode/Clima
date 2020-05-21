@@ -10,6 +10,7 @@ import 'package:bdmap_location_flutter_plugin/flutter_baidu_location_ios_option.
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+
 const weatherApiKey = '10fa5181377e492f86277c71dc19b2b4';
 
 class LoadingScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     _locationListener =
         _locationPlugin.onResultCallback().listen((Map<String, Object> result) {
-      setState(() {
+//      setState(() {
         _loationResult = result;
          if(weatherData == null) getData();
         try {
@@ -49,7 +50,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         } catch (e) {
           print(e);
         }
-      });
+//      });
     });
 
     _startLocation();
@@ -116,14 +117,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
     double longitude = _loationResult['longitude'];
     double latitude = _loationResult['latitude'];
 
-    NetworkHelp networkHelp = NetworkHelp('https://free-api.heweather.net/s6/weather/now?location=$longitude,$latitude&key=$weatherApiKey');
+//    NetworkHelp networkHelp = NetworkHelp('https://free-api.heweather.net/s6/weather/now?location=$longitude,$latitude&key=$weatherApiKey');
+    NetworkHelp networkHelp = NetworkHelp('https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=7174d63e98b5ad444037180b232c75c2&units=metric');
     weatherData = await networkHelp.getData();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return LocationScreen(locationWeather: weatherData,);
     }));
 
     print(_loationResult.toString());
-    print(weatherData);
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa$weatherData');
   }
 
   @override

@@ -16,25 +16,6 @@ class Location {
   String latitude;
   String longitude;
 
-  Location() {
-    _locationPlugin.requestPermission();
-
-    /// 设置ios端ak, android端ak可以直接在清单文件中配置
-    LocationFlutterPlugin.setApiKey("4fBiqxUXzDF3VaYZXf6TpiBiLfKLAqN6");
-
-    _locationListener =
-        _locationPlugin.onResultCallback().listen((Map<String, Object> result) {
-      _loationResult = result;
-      try {
-        _baiduLocation =
-            BaiduLocation.fromMap(result); // 将原生端返回的定位结果信息存储在定位结果类中
-         print(_baiduLocation.getMap());
-      } catch (e) {
-        print(e);
-      }
-    });
-  }
-
   /// 设置android端和ios端定位参数
   void _setLocOption() {
     /// android 端设置定位参数
@@ -54,10 +35,11 @@ class Location {
     /// ios 端设置定位参数
     BaiduLocationIOSOption iosOption = new BaiduLocationIOSOption();
     iosOption.setIsNeedNewVersionRgc(true); // 设置是否需要返回最新版本rgc信息
-    iosOption.setBMKLocationCoordinateType("BMKLocationCoordinateTypeBMK09LL"); // 设置返回的位置坐标系类型
+    iosOption.setBMKLocationCoordinateType(
+        "BMKLocationCoordinateTypeBMK09LL"); // 设置返回的位置坐标系类型
     iosOption.setActivityType("CLActivityTypeAutomotiveNavigation"); // 设置应用位置类型
     iosOption.setLocationTimeout(10); // 设置位置获取超时时间
-    iosOption.setDesiredAccuracy("kCLLocationAccuracyBest");  // 设置预期精度参数
+    iosOption.setDesiredAccuracy("kCLLocationAccuracyBest"); // 设置预期精度参数
     iosOption.setReGeocodeTimeout(10); // 设置获取地址信息超时时间
     iosOption.setDistanceFilter(100); // 设置定位最小更新距离
     iosOption.setAllowsBackgroundLocationUpdates(true); // 是否允许后台定位
@@ -83,9 +65,30 @@ class Location {
     }
   }
 
-  Future<Map<String, Object>> getLocation() async{
+  Future<Map<String, Object>> getLocation() async {
+    _locationPlugin.requestPermission();
+
+    /// 设置ios端ak, android端ak可以直接在清单文件中配置
+    LocationFlutterPlugin.setApiKey("4fBiqxUXzDF3VaYZXf6TpiBiLfKLAqN6");
+
+    _locationListener =
+        _locationPlugin.onResultCallback().listen((Map<String, Object> result) {
+          _loationResult = result;
+          try {
+            _baiduLocation =
+                BaiduLocation.fromMap(result); // 将原生端返回的定位结果信息存储在定位结果类中
+            print(_baiduLocation.getMap());
+          } catch (e) {
+            print(e);
+          }
+        });
+
+
     _startLocation();
+
+    const timeout = const Duration(seconds: 1);
+
+
     return _loationResult;
   }
-
 }
